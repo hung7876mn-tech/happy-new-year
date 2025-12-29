@@ -11,7 +11,7 @@ const App: React.FC = () => {
   const [timeLeft, setTimeLeft] = useState<TimeLeft>({ days: 0, hours: 0, minutes: 0, seconds: 0, total: 0 });
   const [messageIndex, setMessageIndex] = useState(0);
 
-  // Thời điểm chuyển giao: 00:00:00 ngày 01/01/2026
+  // Mục tiêu: 00:00:00 ngày 01/01/2026
   const TARGET_DATE = new Date('2026-01-01T00:00:00').getTime();
   
   const calculateTimeLeft = useCallback((): TimeLeft => {
@@ -38,7 +38,7 @@ const App: React.FC = () => {
       const remaining = calculateTimeLeft();
       setTimeLeft(remaining);
 
-      // Khi đồng hồ về 0
+      // Khi đồng hồ đếm ngược kết thúc
       if (remaining.total <= 0 && status === AppStatus.COUNTDOWN) {
         clearInterval(timer);
         triggerSequence();
@@ -49,10 +49,10 @@ const App: React.FC = () => {
   }, [isStarted, status, calculateTimeLeft]);
 
   const triggerSequence = () => {
-    // 1. Dừng đếm ngược, hiện quả pháo nổ chậm (Giai đoạn FUSE - Nhạc 1 dừng ở đây)
+    // 1. Hiện quả pháo nổ chậm (Giai đoạn FUSE - 1 giây)
     setStatus(AppStatus.FUSE);
     
-    // 2. Sau 1 giây, bắt đầu pháo hoa và Nhạc 2
+    // 2. Sau đúng 1 giây, bắn pháo hoa và đổi nhạc sang i3LYCGQLHsM
     setTimeout(() => {
       setStatus(AppStatus.CELEBRATION);
       startMessageSequence();
@@ -60,15 +60,15 @@ const App: React.FC = () => {
   };
 
   const startMessageSequence = () => {
-    // Lời chúc 1: Hiện lên
+    // Lời chúc 1: "chúc tất cả mọi người thành công trong cuộc sống"
     setMessageIndex(1);
     
-    // Sau 5 giây, ẩn lời chúc 1, hiện lời chúc 2
+    // Sau 5 giây, lời chúc 1 biến mất, hiện lời chúc 2: "chúc mừng năm mới 2026"
     setTimeout(() => {
       setMessageIndex(2);
     }, 5000);
 
-    // Sau 10 giây (tổng cộng), ẩn lời chúc 2, hiện "Happy New Year"
+    // Sau 10 giây (tổng cộng), lời chúc 2 biến mất, hiện "Happy New Year"
     setTimeout(() => {
       setMessageIndex(3);
     }, 10000);
@@ -87,50 +87,50 @@ const App: React.FC = () => {
 
   return (
     <div className="relative min-h-screen w-full flex items-center justify-center bg-black overflow-hidden selection:bg-yellow-500 selection:text-black">
+      {/* Trình phát nhạc quản lý 2 bản nhạc */}
       <MusicPlayer status={status} isStarted={isStarted} />
 
-      {/* Màn hình khởi động để kích hoạt âm thanh */}
+      {/* Màn hình khởi động */}
       {!isStarted && (
-        <div className="z-50 flex flex-col items-center space-y-8 animate-fade-in text-center px-4">
-          <div className="space-y-2">
-            <h1 className="text-white text-3xl md:text-5xl font-black tracking-widest uppercase bg-clip-text text-transparent bg-gradient-to-b from-white to-gray-500">
-              New Year 2026
+        <div className="z-50 flex flex-col items-center space-y-10 animate-fade-in text-center px-4">
+          <div className="space-y-4">
+            <h1 className="text-white text-5xl md:text-7xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-b from-white via-white to-gray-600">
+              NEW YEAR 2026
             </h1>
-            <p className="text-yellow-500 tracking-[0.3em] uppercase text-sm">Countdown Experience</p>
+            <p className="text-yellow-500 tracking-[0.8em] uppercase text-sm font-bold opacity-60">Prepare for the Moment</p>
           </div>
           <button
             onClick={handleStart}
-            className="group relative px-16 py-6 overflow-hidden bg-white text-black rounded-full text-2xl font-bold transition-all hover:pr-20 hover:bg-yellow-400 active:scale-95"
+            className="group relative px-20 py-8 overflow-hidden bg-white text-black rounded-2xl text-3xl font-black transition-all hover:bg-yellow-400 hover:shadow-[0_0_50px_rgba(250,204,21,0.4)] active:scale-95"
           >
-            <span className="relative z-10">BẮT ĐẦU</span>
-            <span className="absolute right-6 top-1/2 -translate-y-1/2 opacity-0 group-hover:opacity-100 transition-all">→</span>
+            <span className="relative z-10">BẮT ĐẦU ĐẾM NGƯỢC</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-400 to-orange-500 translate-y-full group-hover:translate-y-0 transition-transform"></div>
           </button>
-          <p className="text-gray-500 text-xs italic">Vui lòng bật âm lượng để có trải nghiệm tốt nhất</p>
         </div>
       )}
 
-      {/* Giao diện chính */}
+      {/* Giao diện Đếm ngược & Chúc mừng */}
       {isStarted && (
-        <div className="z-10 w-full max-w-5xl px-4 text-center">
+        <div className="z-10 w-full max-w-6xl px-6 text-center">
           {status === AppStatus.COUNTDOWN && (
             <CountdownDisplay timeLeft={timeLeft} />
           )}
 
           {status === AppStatus.FUSE && (
-            <div className="flex flex-col items-center justify-center space-y-8">
-              <div className="relative w-32 h-48 flex flex-col items-center justify-end">
-                {/* Quả pháo */}
-                <div className="w-24 h-40 bg-gradient-to-b from-red-600 to-red-800 rounded-2xl shadow-2xl border-2 border-red-500 flex flex-col items-center justify-center relative overflow-hidden">
-                   <div className="absolute inset-0 bg-black/20 animate-pulse"></div>
-                   <span className="text-white font-black text-3xl rotate-90">2026</span>
+            <div className="flex flex-col items-center justify-center space-y-12 animate-pulse">
+              <div className="relative w-40 h-64 flex flex-col items-center justify-end">
+                {/* Hình ảnh quả pháo */}
+                <div className="w-32 h-52 bg-gradient-to-b from-red-600 to-red-900 rounded-3xl shadow-[0_0_40px_rgba(220,38,38,0.6)] border-4 border-red-500/50 flex flex-col items-center justify-center relative">
+                   <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20"></div>
+                   <span className="text-white font-black text-5xl rotate-90 tracking-tighter">BOOM</span>
                 </div>
-                {/* Ngòi nổ */}
-                <div className="absolute top-[-30px] w-1 h-10 bg-gray-600 origin-bottom">
-                   <div className="w-4 h-4 bg-yellow-400 rounded-full animate-ping absolute top-0 left-[-6px] shadow-[0_0_15px_yellow]"></div>
-                   <div className="w-2 h-2 bg-white rounded-full absolute top-1 left-[-2px]"></div>
+                {/* Ngòi nổ đang cháy */}
+                <div className="absolute top-[-40px] w-1.5 h-12 bg-gray-700 origin-bottom">
+                   <div className="w-8 h-8 bg-yellow-400 rounded-full animate-ping absolute top-[-10px] left-[-12px] shadow-[0_0_30px_rgba(253,224,71,1)]"></div>
+                   <div className="w-4 h-4 bg-orange-500 rounded-full absolute top-[-2px] left-[-5px] animate-bounce"></div>
                 </div>
               </div>
-              <p className="text-5xl text-white font-black tracking-[1em] uppercase ml-[1em] animate-pulse">
+              <p className="text-6xl text-white font-black tracking-[0.5em] uppercase animate-bounce drop-shadow-2xl">
                 SẮP NỔ...
               </p>
             </div>
@@ -139,19 +139,19 @@ const App: React.FC = () => {
           {status === AppStatus.CELEBRATION && (
             <>
               <Fireworks />
-              <div className="relative z-20 flex flex-col items-center justify-center min-h-[400px]">
+              <div className="relative z-20 flex flex-col items-center justify-center min-h-[500px]">
                 {messageIndex === 1 && (
-                  <h1 className="text-4xl md:text-7xl font-bold text-white leading-tight animate-fade-in-out drop-shadow-[0_0_20px_rgba(255,255,255,0.8)] px-4">
+                  <h1 className="text-5xl md:text-8xl font-bold text-white leading-tight animate-fade-in-out drop-shadow-[0_0_30px_rgba(255,255,255,0.8)] max-w-4xl px-4">
                     Chúc tất cả mọi người thành công trong cuộc sống
                   </h1>
                 )}
                 {messageIndex === 2 && (
-                  <h1 className="text-5xl md:text-9xl font-black text-yellow-400 animate-fade-in-out drop-shadow-[0_0_30px_rgba(255,215,0,0.6)] px-4">
+                  <h1 className="text-6xl md:text-[10rem] font-black text-yellow-400 animate-fade-in-out drop-shadow-[0_0_50px_rgba(255,215,0,0.7)] tracking-tighter">
                     Chúc mừng năm mới 2026
                   </h1>
                 )}
                 {messageIndex === 3 && (
-                  <h1 className="text-7xl md:text-[13rem] dancing-script text-transparent bg-clip-text bg-gradient-to-t from-yellow-600 via-yellow-200 to-yellow-400 animate-scale-up drop-shadow-[0_0_40px_rgba(255,215,0,0.5)]">
+                  <h1 className="text-8xl md:text-[15rem] dancing-script text-transparent bg-clip-text bg-gradient-to-t from-yellow-700 via-yellow-200 to-yellow-500 animate-scale-up drop-shadow-[0_0_60px_rgba(255,215,0,0.6)]">
                     Happy New Year
                   </h1>
                 )}
@@ -161,47 +161,47 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* Hiệu ứng ánh sáng nền */}
-      <div className="absolute inset-0 z-0 opacity-40 pointer-events-none">
-        <div className="absolute top-1/4 left-1/4 w-[500px] h-[500px] bg-red-900/20 rounded-full blur-[120px] animate-blob"></div>
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-yellow-900/20 rounded-full blur-[120px] animate-blob animation-delay-2000"></div>
+      {/* Hiệu ứng ánh sáng nền sang trọng */}
+      <div className="absolute inset-0 z-0 opacity-50 pointer-events-none">
+        <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-red-900/10 rounded-full blur-[150px] animate-blob"></div>
+        <div className="absolute bottom-1/4 right-1/4 w-[800px] h-[800px] bg-yellow-900/10 rounded-full blur-[150px] animate-blob animation-delay-2000"></div>
       </div>
 
       <style>{`
         @keyframes fadeInOut {
-          0% { opacity: 0; transform: scale(0.8) translateY(30px); filter: blur(10px); }
+          0% { opacity: 0; transform: scale(0.8) translateY(50px); filter: blur(20px); }
           10% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
           90% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
-          100% { opacity: 0; transform: scale(1.1) translateY(-30px); filter: blur(10px); }
+          100% { opacity: 0; transform: scale(1.1) translateY(-50px); filter: blur(20px); }
         }
         .animate-fade-in-out {
-          animation: fadeInOut 5s forwards cubic-bezier(0.4, 0, 0.2, 1);
+          animation: fadeInOut 5s forwards cubic-bezier(0.23, 1, 0.32, 1);
         }
         @keyframes scaleUp {
-          0% { opacity: 0; transform: scale(0.3) rotate(-5deg); filter: blur(20px); }
+          0% { opacity: 0; transform: scale(0.2) rotate(-10deg); filter: blur(30px); }
           100% { opacity: 1; transform: scale(1) rotate(0); filter: blur(0); }
         }
         .animate-scale-up {
-          animation: scaleUp 2.5s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
+          animation: scaleUp 3s forwards cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         @keyframes blob {
           0% { transform: translate(0px, 0px) scale(1); }
-          33% { transform: translate(60px, -60px) scale(1.3); }
-          66% { transform: translate(-40px, 40px) scale(0.7); }
+          33% { transform: translate(100px, -100px) scale(1.4); }
+          66% { transform: translate(-60px, 60px) scale(0.6); }
           100% { transform: translate(0px, 0px) scale(1); }
         }
         .animate-blob {
-          animation: blob 15s infinite alternate ease-in-out;
+          animation: blob 20s infinite alternate ease-in-out;
         }
         .animation-delay-2000 {
-          animation-delay: 3s;
+          animation-delay: 5s;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: scale(0.95); }
-            to { opacity: 1; transform: scale(1); }
+            from { opacity: 0; transform: translateY(50px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in {
-            animation: fadeIn 2s ease-out forwards;
+            animation: fadeIn 2.5s ease-out forwards;
         }
       `}</style>
     </div>
