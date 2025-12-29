@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { TimeLeft } from '../types';
 
@@ -21,7 +20,7 @@ const CountdownDisplay: React.FC<CountdownDisplayProps> = ({ timeLeft }) => {
           Countdown to New Year
         </h2>
         <p className="text-yellow-500 text-xl md:text-2xl tracking-[0.5em] font-light uppercase opacity-80">
-          with People
+          with peoe
         </p>
       </div>
       
